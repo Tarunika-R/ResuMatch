@@ -1,5 +1,3 @@
-# app.py
-
 from flask import Flask, render_template, request, send_file
 import joblib
 import os
@@ -9,6 +7,7 @@ from sentence_transformers import SentenceTransformer, util
 from fpdf import FPDF
 import smtplib
 import sqlite3
+from difflib import SequenceMatcher
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
@@ -31,6 +30,7 @@ def init_db():
                         applied_role TEXT,
                         predicted_role TEXT,
                         match_score REAL,
+                        resume_score REAL,
                         feedback TEXT
                       )''')
     conn.commit()
@@ -52,7 +52,7 @@ def parse_resume(file):
     return ""
 
 # PDF generator
-def generate_feedback_pdf(predicted_role, match_score, match_feedback, missing_keywords):
+def generate_feedback_pdf(predicted_role, match_score, resume_score, match_feedback, missing_keywords):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
@@ -60,6 +60,7 @@ def generate_feedback_pdf(predicted_role, match_score, match_feedback, missing_k
     pdf.ln(10)
     pdf.multi_cell(0, 10, f"Predicted Role: {predicted_role}\n")
     pdf.multi_cell(0, 10, f"Similarity Score: {match_score}%\n")
+    pdf.multi_cell(0, 10, f"Resume Fit Score: {resume_score}%\n")
     pdf.multi_cell(0, 10, f"Feedback: {match_feedback}\n")
     if missing_keywords:
         pdf.multi_cell(0, 10, "Missing Keywords:")
@@ -94,8 +95,11 @@ def send_email(recipient_email, subject, body, attachment_path):
 def index():
     prediction = None
     match_score = None
+    resume_score = None
     match_feedback = None
     missing_keywords = []
+    email_sent = False
+    email = ""
 
     if request.method == 'POST':
         role_applied = request.form['applied_role']
@@ -114,6 +118,9 @@ def index():
             score = util.pytorch_cos_sim(resume_emb, job_emb).item()
             match_score = round(score * 100, 2)
 
+            role_similarity = SequenceMatcher(None, prediction.lower(), role_applied.lower()).ratio()
+            resume_score = round(role_similarity * 100, 2)
+
             if prediction.lower() == role_applied.lower():
                 match_feedback = "Your resume matches the applied role."
             else:
@@ -128,20 +135,24 @@ def index():
             # Save to DB
             conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO evaluations (email, applied_role, predicted_role, match_score, feedback) VALUES (?, ?, ?, ?, ?)",
-                           (email, role_applied, prediction, match_score, match_feedback))
+            cursor.execute("INSERT INTO evaluations (email, applied_role, predicted_role, match_score, resume_score, feedback) VALUES (?, ?, ?, ?, ?, ?)",
+                           (email, role_applied, prediction, match_score, resume_score, match_feedback))
             conn.commit()
             conn.close()
 
             # Generate and send feedback PDF
-            pdf_path = generate_feedback_pdf(prediction, match_score, match_feedback, missing_keywords)
+            pdf_path = generate_feedback_pdf(prediction, match_score, resume_score, match_feedback, missing_keywords)
             send_email(email, "Your Resume Evaluation Report", "Please find the attached report.", pdf_path)
+            email_sent = True
 
     return render_template("index.html",
                            prediction=prediction,
                            match_score=match_score,
+                           resume_score=resume_score,
                            match_feedback=match_feedback,
-                           missing_keywords=missing_keywords)
+                           missing_keywords=missing_keywords,
+                           email_sent=email_sent,
+                           email=email)
 
 if __name__ == '__main__':
     app.run(debug=True)

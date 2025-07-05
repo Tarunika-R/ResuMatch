@@ -1,0 +1,33 @@
+body {
+    background: #f8f9fa;
+}
+
+.text-center{
+    margin-top: 50px;
+}
+
+.split-container {
+    display: flex;
+    gap: 30px;
+    padding: 20px;
+    justify-content: center;
+}
+
+.left, .right {
+    flex: 1;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    max-width: 500px;
+}
+
+.right {
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.badge-pill {
+    font-size: 0.95rem;
+    padding: 0.6em 1em;
+}
