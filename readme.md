@@ -108,4 +108,22 @@ project/
    python app.py
    ```
 
+---
+
+## 🖼️ UI Screenshots
+
+### 📤 Resume Upload & Input Panel
+
+> ![Upload Panel](screenshots/screenshot1.png)
+
+### 📊 Results and Evaluation Panel
+
+> ![Email Sent Alert](screenshots/screenshot2.png)
+
+### ✅ Success Notification with Email Sent
+
+> ![Output Panel](screenshots/screenshot3.png)
+
+---
+
 Then go to: http://localhost:5000/
