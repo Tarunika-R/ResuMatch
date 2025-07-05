@@ -1,5 +1,3 @@
-# resume_classifier_app.py (Streamlit UI)
-
 import streamlit as st
 import pandas as pd
 import joblib
@@ -13,9 +11,7 @@ import PyPDF2
 from sentence_transformers import SentenceTransformer, util
 from difflib import SequenceMatcher
 
-# -------------------
 # RESUME PARSING
-# -------------------
 def parse_pdf(file):
     reader = PyPDF2.PdfReader(file)
     text = ""
@@ -26,9 +22,7 @@ def parse_pdf(file):
 def parse_docx(file):
     return docx2txt.process(file)
 
-# -------------------
-# STREAMLIT UI
-# -------------------
+# UI
 st.set_page_config(page_title="Resume Classifier + JD Match", layout="centered")
 st.title("📄 Resume Job Fit Evaluator using NLP")
 st.write("Upload a resume and paste a job description to evaluate match accuracy.")
@@ -51,7 +45,7 @@ if uploaded_file and job_description and applied_role:
         st.text_area("Resume Content", file_text[:1500] + ("..." if len(file_text) > 1500 else ""))
 
         # Load classification model
-        model = joblib.load('resume_classifier.pkl')
+        model = joblib.load('model/resume_classifier.pkl')
         predicted_role = model.predict([file_text])[0]
         st.success(f"✅ Predicted Job Role from Resume: **{predicted_role}**")
 
