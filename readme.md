@@ -88,31 +88,24 @@ project/
 ## 🧪 Local Setup
 
 1. Clone the repo
-
-```bash
-git clone https://github.com/yourusername/resume-evaluator.git
-cd resume-evaluator
-```
-
+   ```bash
+   git clone https://github.com/yourusername/resume-evaluator.git
+   cd resume-evaluator
+   ```
 2. Create virtual environment
-
-```bash
-python -m venv .venv
-source .venv/bin/activate  # for Linux/Mac
-# OR
-.venv\Scripts\activate     # for Windows
-```
-
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # for Linux/Mac
+   # OR
+   .venv\Scripts\activate     # for Windows
+   ```
 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
+   ```bash
+   pip install -r requirements.txt
+   ```
 4. Run the server
-
-```bash
-python app.py
-```
+   ```bash
+   python app.py
+   ```
 
 Then go to: http://localhost:5000/
