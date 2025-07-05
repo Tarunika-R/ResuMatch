@@ -1,0 +1,6 @@
+Flask
+joblib
+docx2txt
+PyPDF2
+sentence-transformers
+fpdf
