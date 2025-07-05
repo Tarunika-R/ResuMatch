@@ -35,8 +35,9 @@ st.write("Upload a resume and paste a job description to evaluate match accuracy
 
 uploaded_file = st.file_uploader("Upload your resume", type=["pdf", "docx"])
 job_description = st.text_area("Paste Job Description")
+applied_role = st.text_input("Enter the Job Role You Are Applying For")
 
-if uploaded_file and job_description:
+if uploaded_file and job_description and applied_role:
     file_text = ""
     if uploaded_file.name.endswith(".pdf"):
         file_text = parse_pdf(uploaded_file)
@@ -51,8 +52,8 @@ if uploaded_file and job_description:
 
         # Load classification model
         model = joblib.load('resume_classifier.pkl')
-        prediction = model.predict([file_text])[0]
-        st.success(f"✅ Predicted Job Role: **{prediction}**")
+        predicted_role = model.predict([file_text])[0]
+        st.success(f"✅ Predicted Job Role from Resume: **{predicted_role}**")
 
         # Load embedding model
         @st.cache_resource
@@ -69,10 +70,17 @@ if uploaded_file and job_description:
         match_percent = round(score * 100, 2)
 
         st.subheader("🔍 Job Match Evaluation")
-        if score >= 0.7:
-            st.success(f"🎯 Good Match! Similarity Score: **{match_percent}%**")
+        st.info(f"You have applied for the role: **{applied_role}**")
+
+        if predicted_role.lower() == applied_role.lower():
+            st.success(f"🎯 Your resume matches the applied role (**{applied_role}**).")
         else:
-            st.error(f"⚠️ Not a Strong Match. Similarity Score: **{match_percent}%**")
+            st.warning(f"⚠️ Your resume seems more suitable for **{predicted_role}**, not **{applied_role}**.")
+
+        if score >= 0.7:
+            st.success(f"🟢 Good Match with Job Description! Similarity Score: **{match_percent}%**")
+        else:
+            st.error(f"🔴 Not a Strong Match with Job Description. Similarity Score: **{match_percent}%**")
             if st.button("What is Missing?"):
                 # Local fallback for missing skills
                 resume_words = set(file_text.lower().split())
