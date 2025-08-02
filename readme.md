@@ -6,7 +6,7 @@ An intelligent web application that evaluates a user’s resume against a provid
 
 ## 🚀 Features
 
-- ✅ Upload resume (.pdf / .docx)
+- ✅ Upload resume (.pdf)
 - 🎯 Predict job role using trained ML model
 - 🤖 Semantic similarity score between resume and JD using Sentence Transformers
 - 📊 Resume fit score based on string similarity between applied and predicted role
